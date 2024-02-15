@@ -1,0 +1,27 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install httpd package
+    yum:
+      name: httpd
+      state: latest
+
+  - name: install samba package
+    yum:
+     name: samba
+     state: latest
+
+  - name: ensure httpd  services are running
+    service:
+     name: httpd
+     state: started
+     enabled: false
+
+  - name: ensure samba service is running
+    service:
+     name: smb        
+     state: started
+     enabled: true 
