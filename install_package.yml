@@ -8,20 +8,53 @@
     yum:
       name: httpd
       state: latest
+    when: ansible_distribution == "CentOS"  
 
   - name: install samba package
     yum:
      name: samba
      state: latest
+    when: ansible_distribution == "CentOS"  
 
   - name: ensure httpd  services are running
     service:
      name: httpd
      state: started
-     enabled: false
+     enabled: true
+    when: ansible_distribution == "CentOS"
 
   - name: ensure samba service is running
     service:
      name: smb        
      state: started
      enabled: true 
+    when: ansible_distribution == "CentOS" 
+
+
+
+
+
+
+  - name: install apache
+    apt:
+      name: apache2
+      state: latest
+
+  - name: install library support for apache
+    apt:
+     name: libapache2-mod-php
+     state: latest
+
+  - name: ensure apache  service is running
+    service:
+     name: apache2
+     state: started
+     enabled: true
+
+  - name: ensure samba service is running
+    service:
+     name: smb
+     state: stopped 
+     enabled: false
+
+
