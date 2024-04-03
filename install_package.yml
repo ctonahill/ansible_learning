@@ -4,57 +4,63 @@
   become: true
   tasks:
 
-  - name: install httpd package
+  - name: inatsll all latest updates (CentOS)
+    tags: always
     yum:
-      name: httpd
-      state: latest
+       update_only:  no
+       update_cache: yes
+    when: ansible_distribution == "CentOS"   
+
+  - name: install all latest updates/upgrade if neccessary (Ubuntu)
+    tags: always
+    apt:
+       upgrade: dist
+       update_cache: yes
+    when: ansible_distribution == "Ubuntu"   
+
+  - name: install httpd, samba and NFS  packages
+    tags: httpd, CentOS
+    yum:
+      name: 
+      - httpd
+      - samba
+      - nfs-utils
+      state: latest   
+      update_cache: yes
     when: ansible_distribution == "CentOS"  
 
-  - name: install samba package
-    yum:
-     name: samba
-     state: latest
-    when: ansible_distribution == "CentOS"  
-
-  - name: ensure httpd  services are running
+  - name: Start service httpd, if not started
     service:
-     name: httpd
-     state: started
-     enabled: true
+      name: httpd
+      state: started
+      enabled: yes 
     when: ansible_distribution == "CentOS"
 
-  - name: ensure samba service is running
-    service:
-     name: smb        
-     state: started
-     enabled: true 
-    when: ansible_distribution == "CentOS" 
-
-
-
-
-
+  - name: copy default html file for site          
+    ansible.builtin.copy:
+      src:  /root/ansible_learning/file_mngt/default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+    when: ansible_distribution == "CentOS"
 
   - name: install apache
+    tags: apache2, Ubuntu
     apt:
       name: apache2
-      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
 
   - name: install library support for apache
     apt:
      name: libapache2-mod-php
      state: latest
+    when: ansible_distribution == "Ubuntu"  
 
   - name: ensure apache  service is running
     service:
      name: apache2
      state: started
-     enabled: true
-
-  - name: ensure samba service is running
-    service:
-     name: smb
-     state: stopped 
-     enabled: false
-
-
+     enabled: yes
+    when: ansible_distribution == "Ubuntu"
